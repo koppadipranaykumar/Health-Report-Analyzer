@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { login, register } from "../utils/api";
 import { toast } from 'react-toastify';
@@ -46,8 +46,8 @@ const validatePassword = (password) => {
   return strongRegex.test(password);
 };
 
-const AuthForm = ({ onLogin }) => {
-  const [isLogin, setIsLogin] = useState(true);
+const AuthForm = ({ onLogin, isLogin: isLoginProp }) => {
+  const [isLogin, setIsLogin] = useState(isLoginProp);
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -57,10 +57,36 @@ const AuthForm = ({ onLogin }) => {
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  // Password validation checklist state
+const [passwordChecks, setPasswordChecks] = useState({
+  length: false,
+  upper: false,
+  lower: false,
+  number: false,
+  special: false,
+});
+
+// Track password changes live
+const handlePasswordChange = (e) => {
+  const value = e.target.value;
+  setFormData({ ...formData, password: value });
+
+  setPasswordChecks({
+    length: value.length >= 8,
+    upper: /[A-Z]/.test(value),
+    lower: /[a-z]/.test(value),
+    number: /[0-9]/.test(value),
+    special: /[!@#$%^&*(),.?":{}|<>]/.test(value),
+  });
+};
 
   // State for password visibility
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  useEffect(() => {
+    setIsLogin(isLoginProp);
+  }, [isLoginProp]);
 
   const handleChange = (e) => {
     setFormData({
@@ -88,7 +114,7 @@ const AuthForm = ({ onLogin }) => {
   }
 };
 
-
+  
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -237,7 +263,7 @@ const AuthForm = ({ onLogin }) => {
                 id="password"
                 name="password"
                 value={formData.password}
-                onChange={handleChange}
+                onChange={handlePasswordChange}
                 required
                 placeholder="Enter your password"
                 minLength={8}
@@ -250,10 +276,14 @@ const AuthForm = ({ onLogin }) => {
               </span>
             </div>
             {!isLogin && (
-              <small className="form-hint">
-                Password must be at least 8 characters, include uppercase, lowercase, number, and special character.
-              </small>
-            )}
+  <ul className="password-checklist">
+    <li className={passwordChecks.length ? "valid" : "invalid"}>At least 8 characters</li>
+    <li className={passwordChecks.upper ? "valid" : "invalid"}>Contains uppercase letter</li>
+    <li className={passwordChecks.lower ? "valid" : "invalid"}>Contains lowercase letter</li>
+    <li className={passwordChecks.number ? "valid" : "invalid"}>Contains number</li>
+    <li className={passwordChecks.special ? "valid" : "invalid"}>Contains special character</li>
+  </ul>
+)}
           </div>
 
           {!isLogin && (
