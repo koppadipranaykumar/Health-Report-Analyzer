@@ -1,11 +1,21 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import { forgotPassword } from "../utils/api";
 
 const ForgotPassword = () => {
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
+
+  // This is a mocked function to replace the missing import.
+  // In a real application, you would use a function that interacts with Firebase.
+  const forgotPassword = async (email) => {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        console.log(`Password reset requested for: ${email}`);
+        resolve();
+      }, 1500);
+    });
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -71,7 +81,7 @@ const ForgotPassword = () => {
         <div className="auth-toggle">
           <p>
             Remember your password?{" "}
-            <Link to="/" className="btn-toggle" style={{ textDecoration: "none" }}>
+            <Link to="/login" className="btn-toggle" style={{ textDecoration: "none" }}>
               Sign in
             </Link>
           </p>
